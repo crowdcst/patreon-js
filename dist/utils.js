@@ -12,7 +12,7 @@ var _package = require('../package.json');
 var os = require('os');
 
 var BASE_HOST = process.env.PATREON_OAUTH_HOST || 'https://www.patreon.com';
-var BASE_PATH = 'api/oauth2/v2';
+var BASE_PATH = 'api/oauth2/api';
 
 function buildUrl(path) {
     return BASE_HOST + path;
@@ -22,12 +22,13 @@ function stripPreSlash(str) {
     return str.replace(/^\//, '');
 }
 
-function normalizeRequest(request) {
+function normalizeRequest(request, basePath) {
+    basePath = basePath || BASE_PATH;
     return typeof request === 'string' ? {
-        url: BASE_HOST + '/' + BASE_PATH + '/' + stripPreSlash(request),
+        url: BASE_HOST + '/' + basePath + '/' + stripPreSlash(request),
         method: 'GET'
     } : _extends({}, request, {
-        url: BASE_HOST + '/' + BASE_PATH + '/' + stripPreSlash(request.url || request.uri || '')
+        url: BASE_HOST + '/' + basePath + '/' + stripPreSlash(request.url || request.uri || '')
     });
 }
 

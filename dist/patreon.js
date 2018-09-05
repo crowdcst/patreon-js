@@ -16,11 +16,11 @@ var _utils = require('./utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function patreon(accessToken) {
+function patreon(accessToken, basePath) {
     var store = new _jsonapiDatastore.JsonApiDataStore();
 
     var makeRequest = function makeRequest(requestSpec) {
-        var normalizedRequest = (0, _utils.normalizeRequest)(requestSpec);
+        var normalizedRequest = (0, _utils.normalizeRequest)(requestSpec, basePath);
         var url = normalizedRequest.url;
         var options = _extends({}, normalizedRequest, {
             headers: {
