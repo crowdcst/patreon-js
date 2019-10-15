@@ -9,13 +9,18 @@ test('stripPreSlash', (assert) => {
 })
 
 test('normalizeRequest', (assert) => {
-    assert.plan(3)
+    assert.plan(4)
 
     const requestString = '/nested/request/query'
     assert.deepEqual(normalizeRequest(requestString), {
         url: 'https://www.patreon.com/api/oauth2/api/nested/request/query',
         method: 'GET'
     }, 'correctly parses nested request string')
+
+    assert.deepEqual(normalizeRequest(requestString, 'api/oauth2/v2'), {
+        url: 'https://www.patreon.com/api/oauth2/v2/nested/request/query',
+        method: 'GET'
+    }, 'correctly uses the specified baseUrl')
 
     const requestObject = {
         url: 'url',

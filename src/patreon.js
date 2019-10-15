@@ -2,11 +2,11 @@ import fetch from 'isomorphic-fetch'
 import { JsonApiDataStore } from 'jsonapi-datastore'
 import { normalizeRequest, checkStatus, getJson, userAgentString } from './utils'
 
-function patreon(accessToken) {
+function patreon(accessToken, basePath) {
     let store = new JsonApiDataStore()
 
     const makeRequest = requestSpec => {
-        const normalizedRequest = normalizeRequest(requestSpec)
+        const normalizedRequest = normalizeRequest(requestSpec, basePath)
         const url = normalizedRequest.url
         const options = {
             ...normalizedRequest,

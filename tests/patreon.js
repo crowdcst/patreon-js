@@ -70,3 +70,60 @@ test('patreon', (assert) => {
             assert.notEqual(err, null, 'err should not be null')
         })
 })
+
+test('patreon with specified baseUrl for the v2 endpoint', (assert) => {
+    assert.plan(7)
+
+    nock('https://www.patreon.com/api')
+        .get('/oauth2/v2/me')
+        .reply(200, function (uri, body) {
+            assert.ok(
+                this.req.headers.authorization.indexOf('Bearer token') > -1,
+                'Authorization header should be "Bearer token"'
+            )
+
+            return {
+                data: {
+                    type: 'user',
+                    id: '123',
+                    attributes: {
+                        full_name: 'Test User'
+                    },
+                    relationships: {
+                        campaign: {
+                            data: {
+                                type: 'campaign',
+                                id: '456'
+                            }
+                        }
+                    }
+                },
+                included: [{
+                    type: 'campaign',
+                    id: '456',
+                    attributes: {
+                        'pledge_sum': 123456
+                    }
+                }]
+            }
+        })
+
+    const client = patreon('token', 'api/oauth2/v2')
+
+    client('/me')
+        .then(({ store, rawJson }) => {
+            assert.equal(store.find('user', '123').full_name, 'Test User', 'store should be a JSON:API data store')
+            assert.equal(store.find('user', '123').campaign.pledge_sum, 123456, 'store should be a JSON:API data store')
+
+            assert.ok(rawJson, 'rawJson should be a parsed rawJson object')
+            assert.equal(rawJson.data.attributes.full_name, 'Test User', 'rawJson should have the correct content')
+
+            const _store = client.getStore()
+            console.log('_st', JSON.stringify(_store.findAll('user').map(user => user.serialize())))
+            assert.equal(_store.find('user', '123').full_name, 'Test User', 'store should be a JSON:API data store')
+            assert.equal(_store.find('user', '123').campaign.pledge_sum, 123456, 'store should be a JSON:API data store')
+        })
+        .catch((err) => {
+            assert.fail(err, 'promise failed unexpectedly!')
+        })
+})
